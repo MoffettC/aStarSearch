@@ -203,7 +203,7 @@ public class AStar {
            for(int i=0; i < x; i++){
               for(int j=0; j < y; j++){
                   grid[i][j] = new Cell(i, j);
-                  grid[i][j].heuristicCost = Math.abs(i -endI -1) + Math.abs(j -endJ + 1); //going vertical costs 1 less, but horizontal costs one extra
+                //  grid[i][j].heuristicCost = Math.abs(i -endI -1) + Math.abs(j -endJ + 1); //going vertical costs 1 less, but horizontal costs one extra
 //                  System.out.print(grid[i][j].heuristicCost+" ");
               }
            }
@@ -258,7 +258,9 @@ public class AStar {
         		   System.out.printf("  ");
         	   }
                for(int j=0; j<y; j++){          	   
-            	   if (grid[i][j]!=null) System.out.printf("%2d  ", grid[i][j].inheritCost);
+            	   if (grid[i][j]!=null) {
+            		   System.out.printf("%2d  ", grid[i][j].inheritCost);
+            	   }
                    else System.out.print("BL ");               
                }
                System.out.println();
