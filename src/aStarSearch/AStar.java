@@ -8,14 +8,13 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class AStar {
-    public static final int DIAGONAL_COST = 0;
-    public static final int V_H_COST = 0;
     
     static class Cell{  
         int heuristicCost = 0; //Heuristic cost
         int inheritCost = 0;
         int finalCost = 0; //G+H
         int index = -1;
+        boolean isPath = false;
         int i, j;
         Cell parent; 
         
@@ -82,7 +81,7 @@ public class AStar {
             if(current.i-2>=0){
             	next = grid[current.i-2][current.j];
             	if (next.inheritCost >= 0) {
-            	checkAndUpdateCost(current, next, current.finalCost+V_H_COST); //N
+            	checkAndUpdateCost(current, next, current.finalCost); //N
             	}
             }
 
@@ -91,14 +90,14 @@ public class AStar {
             	if ((current.i-1) % 2 == 0){
             		next = grid[current.i-1][current.j];
             		if (next.inheritCost >= 0) {
-            		checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //NW
+            		checkAndUpdateCost(current, next, current.finalCost); //NW
             		}
 
             	} else {
             		if(current.j-1 >= 0){ 
             			next = grid[current.i-1][current.j-1];
             			if (next.inheritCost >= 0) {
-            			checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //NW
+            			checkAndUpdateCost(current, next, current.finalCost); //NW
             			}
             		}
             	}
@@ -108,13 +107,13 @@ public class AStar {
             		if(current.j+1 < grid[0].length){  
             			next = grid[current.i-1][current.j+1];
             			if (next.inheritCost >= 0) {
-            			checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //NE
+            			checkAndUpdateCost(current, next, current.finalCost); //NE
             			}
             		}
             	} else {
             		next = grid[current.i-1][current.j];
             		if (next.inheritCost >= 0) {
-            		checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //NE
+            		checkAndUpdateCost(current, next, current.finalCost); //NE
             		}
             	}
             } 
@@ -132,7 +131,7 @@ public class AStar {
         	if(current.i+2 < grid.length){
         		next = grid[current.i+2][current.j];
         		if (next.inheritCost >= 0) {
-            	checkAndUpdateCost(current, next, current.finalCost+V_H_COST); //S
+            	checkAndUpdateCost(current, next, current.finalCost); //S
         		}
         	}
 
@@ -141,14 +140,14 @@ public class AStar {
         		if ((current.i+1) % 2 == 0){
         			next = grid[current.i+1][current.j];
         			if (next.inheritCost >= 0) {
-        			checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //SW
+        			checkAndUpdateCost(current, next, current.finalCost); //SW
         			}
 
         		} else {
         			if(current.j-1>=0){
         				next = grid[current.i+1][current.j-1];
         				if (next.inheritCost >= 0) {
-        				checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //SW
+        				checkAndUpdateCost(current, next, current.finalCost); //SW
         				}
         			}             	
         		}
@@ -157,13 +156,13 @@ public class AStar {
         			if(current.j+1 < grid[0].length){
         				next = grid[current.i+1][current.j+1];
         				if (next.inheritCost >= 0) {
-        				checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //SE
+        				checkAndUpdateCost(current, next, current.finalCost); //SE
         				}
         			} 
         		} else {
         			next = grid[current.i+1][current.j];
         			if (next.inheritCost >= 0) {
-        			checkAndUpdateCost(current, next, current.finalCost+DIAGONAL_COST); //SE
+        			checkAndUpdateCost(current, next, current.finalCost); //SE
         			}
         		}
 
@@ -252,6 +251,23 @@ public class AStar {
            
           AStar(); 
            
+          int cost = 0;
+           if(closed[endI][endJ]){
+               //Trace back the path 
+                System.out.println("Path: ");
+                Cell current = grid[endI][endJ];
+                grid[si][sj].isPath = true;
+                while(current.parent!=null){
+                    System.out.print(current.index + "\n");
+                    current.isPath = true;
+     			   cost += current.inheritCost;
+                    current = current.parent;
+                } 
+                System.out.print(current.index);
+                System.out.println();
+           }else System.out.println("No possible path");
+           System.out.println("Cost: " + (cost + grid[si][sj].inheritCost));
+           
            System.out.println("\nScores for cells: ");
            for(int i=0; i<x; i++){
         	   if ( i % 2 != 0) {
@@ -259,33 +275,28 @@ public class AStar {
         	   }
                for(int j=0; j<y; j++){          	   
             	   if (grid[i][j]!=null) {
-            		   System.out.printf("%2d  ", grid[i][j].inheritCost);
+            		   if (grid[i][j].inheritCost >= 0){
+            			   if (grid[i][j].isPath){
+                			   System.out.printf("%2d* ", grid[i][j].inheritCost);
+            			   } else {
+                			   System.out.printf("%2d  ", grid[i][j].inheritCost);
+            			   }
+            		   } else{
+            			   System.out.printf("    ");
+            		   }
             	   }
                    else System.out.print("BL ");               
                }
                System.out.println();
            }
            System.out.println();
-            
-           if(closed[endI][endJ]){
-               //Trace back the path 
-                System.out.println("Path: ");
-                Cell current = grid[endI][endJ];
-               // System.out.print(current);
-                while(current.parent!=null){
-//                    System.out.print(" -> " +current.parent);
-//                    current = current.parent;
-                    System.out.print(current.index + "\n");
-                    current = current.parent;
-                } 
-                System.out.print(current.index);
-                System.out.println();
-           }else System.out.println("No possible path");
     }
      
     public static void main(String[] args) throws Exception{ 
     	// The name of the file to open.
-        String fileName = "lattice.txt";
+        String fileName = "testcases-rhythmmecwan.txt";
+        //String fileName = "lattice.txt";
+    	//String fileName = "test_input_1.txt";
         ArrayList<Integer> hexArr = new ArrayList<>();
         
         // This will reference one line at a time
@@ -307,9 +318,5 @@ public class AStar {
         }
     	
         test(1, 31, 8, 30, 0, 0, 7, new int[][]{}, hexArr); 
-        //test(2, 5, 5, 0, 0, 4, 4, new int[][]{{0,4},{2,2},{3,1},{3,3}});   
-        //test(3, 7, 7, 2, 1, 5, 4, new int[][]{{4,1},{4,3},{5,3},{2,3}});
-        
-        //test(1, 5, 5, 0, 0, 4, 4, new int[][]{{3,4},{3,3},{4,3}});
     }
 }
